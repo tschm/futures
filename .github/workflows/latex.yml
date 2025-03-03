@@ -1,0 +1,22 @@
+name: LaTeX
+
+on:
+  push
+
+permissions:
+  contents: write
+
+jobs:
+  build_paper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout [${{ github.repository }}]
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/latex
+        with:
+          paper: paper/futures.tex
+          draft: draft
+
+      # add or remove papers here

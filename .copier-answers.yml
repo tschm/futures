@@ -1,0 +1,10 @@
+_commit: v0.4.63
+_src_path: git@github.com:tschm/package.git
+description: Toying with futures
+gh_create: gh repo create tschm/futures --public --description 'Toying with futures'
+page: https://tschm.github.io/futures
+project_name: futures
+repository: https://github.com/tschm/futures
+ssh_uri: git@github.com:tschm/futures.git
+status: public
+username: tschm
