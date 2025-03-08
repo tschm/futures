@@ -135,6 +135,7 @@ version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "blpapi" },
+    { name = "numpy" },
     { name = "pandas" },
     { name = "xbbg" },
 ]
@@ -149,6 +150,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "blpapi", specifier = ">=3.25.1", index = "https://blpapi.bloomberg.com/repository/releases/python/simple/" },
+    { name = "numpy", specifier = ">=2.2.3" },
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "xbbg", specifier = ">=0.7.7" },
 ]
