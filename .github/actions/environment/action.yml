@@ -50,9 +50,6 @@ runs:
         # Create virtual environment with uv
         uv venv --python ${{ inputs.python-version }}
 
-        # Ensure pip is installed and up-to-date in the virtual environment
-        python -m ensurepip --upgrade
-
     # run if the file pyproject.toml exists
     - name: Install the dependencies
       shell: bash
@@ -63,3 +60,5 @@ runs:
         else
             uv sync --all-extras --dev  # Install all dependencies (including dev dependencies)
         fi
+
+        uv pip install pip
