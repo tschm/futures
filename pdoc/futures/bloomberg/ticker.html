@@ -74,83 +74,85 @@
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">    :param include_expired_contracts: either True or False</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">    :param before: if specified, ignore contracts with notice before this date</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">    :param after: if specified, ignore contracts with notice after this data</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">    :return: DataFrame with row FIGI code: {FUT_NOTICE_FIRST: date, TICKER: Bloomberg contract name}.</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">    Note that we avoid actual Bloomberg contract names such as CLM2 Comdty as this name is immutable!</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">include</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span> <span class="k">if</span> <span class="n">include_expired_contracts</span> <span class="k">else</span> <span class="s2">&quot;N&quot;</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">contracts</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">future_name</span><span class="p">,</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;FUT_CHAIN&quot;</span><span class="p">,</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="n">ovrds</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;INCLUDE_EXPIRED_CONTRACTS&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">),</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="p">)</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="c1"># or [(&#39;INCLUDE_EXPIRED_CONTRACTS&#39;, include)]</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="n">ref</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">contracts</span><span class="p">,</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_MONTH_YR&quot;</span><span class="p">],</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="p">)</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">stamp</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">stamp</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="k">if</span> <span class="n">before</span><span class="p">:</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">before</span><span class="p">]</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="k">if</span> <span class="n">after</span><span class="p">:</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">after</span><span class="p">]</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;TICKER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">index</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="k">return</span> <span class="n">ref</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">)</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">    :param connection: Optional connection to connect to Bloomberg</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">    :return: DataFrame with row FIGI code: {FUT_NOTICE_FIRST: date, TICKER: Bloomberg contract name}.</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">    Note that we avoid actual Bloomberg contract names such as CLM2 Comdty as this name is immutable!</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">include</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span> <span class="k">if</span> <span class="n">include_expired_contracts</span> <span class="k">else</span> <span class="s2">&quot;N&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">contracts</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">future_name</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>        <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;FUT_CHAIN&quot;</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>        <span class="n">ovrds</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;INCLUDE_EXPIRED_CONTRACTS&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">),</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="p">)</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="c1"># or [(&#39;INCLUDE_EXPIRED_CONTRACTS&#39;, include)]</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="n">ref</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">contracts</span><span class="p">,</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>        <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_MONTH_YR&quot;</span><span class="p">],</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="p">)</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">stamp</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">stamp</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="k">if</span> <span class="n">before</span><span class="p">:</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">before</span><span class="p">]</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="k">if</span> <span class="n">after</span><span class="p">:</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">after</span><span class="p">]</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;TICKER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">index</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="k">return</span> <span class="n">ref</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">)</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="k">def</span><span class="w"> </span><span class="nf">ticker_continuous</span><span class="p">(</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>    <span class="n">ticker</span><span class="p">,</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="n">pricing_source</span><span class="o">=</span><span class="s2">&quot;EXCH&quot;</span><span class="p">,</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="n">roll_type</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="n">number_of_days</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="n">number_of_months</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="n">roll_adjustment</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="p">):</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">    Function to create the Bloomberg ticker names for continuous futures</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">    :param ticker: A name for a future, such as CC1 Comdty</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a><span class="sd">    :param pricing_source: usually &quot;EXCH&quot;</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="sd">    :param roll_type:</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="sd">                * N - Roll at first notice,</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="sd">                * R - relative at expiration</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="sd">    :param number_of_days: number of days prior to notice or expiration</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">    :param number_of_months: number of months prior to notice or expiration</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="sd">    :param roll_adjustment:</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="sd">                * N - no roll adjustment</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="sd">                * D - roll adjustment by difference</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a><span class="sd">                * W - roll adjustment by weighted average</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="sd">                * R - roll adjustment by ratio</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a><span class="sd">    :return:</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>
-</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">):</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>        <span class="n">typ</span> <span class="o">=</span> <span class="s2">&quot;Index&quot;</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>
-</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Comdty&quot;</span><span class="p">):</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>        <span class="n">typ</span> <span class="o">=</span> <span class="s2">&quot;Comdty&quot;</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>
-</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Curncy&quot;</span><span class="p">):</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>        <span class="n">typ</span> <span class="o">=</span> <span class="s2">&quot;Curncy&quot;</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>
-</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{ticker}</span><span class="s2"> </span><span class="si">{roll_type}</span><span class="s2">:</span><span class="si">{days:02d}</span><span class="s2">_</span><span class="si">{months}</span><span class="s2">_</span><span class="si">{roll_adj}</span><span class="s2"> </span><span class="si">{source}</span><span class="s2"> </span><span class="si">{typ}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a>        <span class="n">ticker</span><span class="o">=</span><span class="n">ticker</span><span class="p">,</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos">88</span></a>        <span class="n">roll_type</span><span class="o">=</span><span class="n">roll_type</span><span class="p">,</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos">89</span></a>        <span class="n">days</span><span class="o">=</span><span class="n">number_of_days</span><span class="p">,</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos">90</span></a>        <span class="n">months</span><span class="o">=</span><span class="n">number_of_months</span><span class="p">,</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos">91</span></a>        <span class="n">roll_adj</span><span class="o">=</span><span class="n">roll_adjustment</span><span class="p">,</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos">92</span></a>        <span class="n">source</span><span class="o">=</span><span class="n">pricing_source</span><span class="p">,</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos">93</span></a>        <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos">94</span></a>    <span class="p">)</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="k">def</span><span class="w"> </span><span class="nf">ticker_continuous</span><span class="p">(</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="n">ticker</span><span class="p">,</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="n">pricing_source</span><span class="o">=</span><span class="s2">&quot;EXCH&quot;</span><span class="p">,</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="n">roll_type</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="n">number_of_days</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="n">number_of_months</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="n">roll_adjustment</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="p">):</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">    Function to create the Bloomberg ticker names for continuous futures</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a><span class="sd">    :param ticker: A name for a future, such as CC1 Comdty</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="sd">    :param pricing_source: usually &quot;EXCH&quot;</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="sd">    :param roll_type:</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="sd">                * N - Roll at first notice,</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="sd">                * R - relative at expiration</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">    :param number_of_days: number of days prior to notice or expiration</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="sd">    :param number_of_months: number of months prior to notice or expiration</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="sd">    :param roll_adjustment:</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="sd">                * N - no roll adjustment</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a><span class="sd">                * D - roll adjustment by difference</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="sd">                * W - roll adjustment by weighted average</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a><span class="sd">                * R - roll adjustment by ratio</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a><span class="sd">    :return:</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>    <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">):</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>        <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;Index&quot;</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Comdty&quot;</span><span class="p">):</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>        <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;Comdty&quot;</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>
+</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Curncy&quot;</span><span class="p">):</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>        <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;Curncy&quot;</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos">88</span></a>    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{ticker}</span><span class="s2"> </span><span class="si">{roll_type}</span><span class="s2">:</span><span class="si">{days:02d}</span><span class="s2">_</span><span class="si">{months}</span><span class="s2">_</span><span class="si">{roll_adj}</span><span class="s2"> </span><span class="si">{source}</span><span class="s2"> </span><span class="si">{_type}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos">89</span></a>        <span class="n">ticker</span><span class="o">=</span><span class="n">ticker</span><span class="p">,</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos">90</span></a>        <span class="n">roll_type</span><span class="o">=</span><span class="n">roll_type</span><span class="p">,</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos">91</span></a>        <span class="n">days</span><span class="o">=</span><span class="n">number_of_days</span><span class="p">,</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos">92</span></a>        <span class="n">months</span><span class="o">=</span><span class="n">number_of_months</span><span class="p">,</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos">93</span></a>        <span class="n">roll_adj</span><span class="o">=</span><span class="n">roll_adjustment</span><span class="p">,</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos">94</span></a>        <span class="n">source</span><span class="o">=</span><span class="n">pricing_source</span><span class="p">,</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos">95</span></a>        <span class="n">_type</span><span class="o">=</span><span class="n">_type</span><span class="p">,</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos">96</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 
@@ -178,35 +180,36 @@
 </span><span id="chain-16"><a href="#chain-16"><span class="linenos">16</span></a><span class="sd">    :param include_expired_contracts: either True or False</span>
 </span><span id="chain-17"><a href="#chain-17"><span class="linenos">17</span></a><span class="sd">    :param before: if specified, ignore contracts with notice before this date</span>
 </span><span id="chain-18"><a href="#chain-18"><span class="linenos">18</span></a><span class="sd">    :param after: if specified, ignore contracts with notice after this data</span>
-</span><span id="chain-19"><a href="#chain-19"><span class="linenos">19</span></a><span class="sd">    :return: DataFrame with row FIGI code: {FUT_NOTICE_FIRST: date, TICKER: Bloomberg contract name}.</span>
-</span><span id="chain-20"><a href="#chain-20"><span class="linenos">20</span></a><span class="sd">    Note that we avoid actual Bloomberg contract names such as CLM2 Comdty as this name is immutable!</span>
-</span><span id="chain-21"><a href="#chain-21"><span class="linenos">21</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="chain-22"><a href="#chain-22"><span class="linenos">22</span></a>    <span class="n">include</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span> <span class="k">if</span> <span class="n">include_expired_contracts</span> <span class="k">else</span> <span class="s2">&quot;N&quot;</span>
-</span><span id="chain-23"><a href="#chain-23"><span class="linenos">23</span></a>    <span class="n">contracts</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
-</span><span id="chain-24"><a href="#chain-24"><span class="linenos">24</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">future_name</span><span class="p">,</span>
-</span><span id="chain-25"><a href="#chain-25"><span class="linenos">25</span></a>        <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;FUT_CHAIN&quot;</span><span class="p">,</span>
-</span><span id="chain-26"><a href="#chain-26"><span class="linenos">26</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
-</span><span id="chain-27"><a href="#chain-27"><span class="linenos">27</span></a>        <span class="n">ovrds</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;INCLUDE_EXPIRED_CONTRACTS&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">),</span>
-</span><span id="chain-28"><a href="#chain-28"><span class="linenos">28</span></a>    <span class="p">)</span>
-</span><span id="chain-29"><a href="#chain-29"><span class="linenos">29</span></a>
-</span><span id="chain-30"><a href="#chain-30"><span class="linenos">30</span></a>    <span class="c1"># or [(&#39;INCLUDE_EXPIRED_CONTRACTS&#39;, include)]</span>
-</span><span id="chain-31"><a href="#chain-31"><span class="linenos">31</span></a>
-</span><span id="chain-32"><a href="#chain-32"><span class="linenos">32</span></a>    <span class="n">ref</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
-</span><span id="chain-33"><a href="#chain-33"><span class="linenos">33</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">contracts</span><span class="p">,</span>
-</span><span id="chain-34"><a href="#chain-34"><span class="linenos">34</span></a>        <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_MONTH_YR&quot;</span><span class="p">],</span>
-</span><span id="chain-35"><a href="#chain-35"><span class="linenos">35</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
-</span><span id="chain-36"><a href="#chain-36"><span class="linenos">36</span></a>    <span class="p">)</span>
-</span><span id="chain-37"><a href="#chain-37"><span class="linenos">37</span></a>
-</span><span id="chain-38"><a href="#chain-38"><span class="linenos">38</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">stamp</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">stamp</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
-</span><span id="chain-39"><a href="#chain-39"><span class="linenos">39</span></a>
-</span><span id="chain-40"><a href="#chain-40"><span class="linenos">40</span></a>    <span class="k">if</span> <span class="n">before</span><span class="p">:</span>
-</span><span id="chain-41"><a href="#chain-41"><span class="linenos">41</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">before</span><span class="p">]</span>
-</span><span id="chain-42"><a href="#chain-42"><span class="linenos">42</span></a>
-</span><span id="chain-43"><a href="#chain-43"><span class="linenos">43</span></a>    <span class="k">if</span> <span class="n">after</span><span class="p">:</span>
-</span><span id="chain-44"><a href="#chain-44"><span class="linenos">44</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">after</span><span class="p">]</span>
-</span><span id="chain-45"><a href="#chain-45"><span class="linenos">45</span></a>
-</span><span id="chain-46"><a href="#chain-46"><span class="linenos">46</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;TICKER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">index</span>
-</span><span id="chain-47"><a href="#chain-47"><span class="linenos">47</span></a>    <span class="k">return</span> <span class="n">ref</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">)</span>
+</span><span id="chain-19"><a href="#chain-19"><span class="linenos">19</span></a><span class="sd">    :param connection: Optional connection to connect to Bloomberg</span>
+</span><span id="chain-20"><a href="#chain-20"><span class="linenos">20</span></a><span class="sd">    :return: DataFrame with row FIGI code: {FUT_NOTICE_FIRST: date, TICKER: Bloomberg contract name}.</span>
+</span><span id="chain-21"><a href="#chain-21"><span class="linenos">21</span></a><span class="sd">    Note that we avoid actual Bloomberg contract names such as CLM2 Comdty as this name is immutable!</span>
+</span><span id="chain-22"><a href="#chain-22"><span class="linenos">22</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="chain-23"><a href="#chain-23"><span class="linenos">23</span></a>    <span class="n">include</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span> <span class="k">if</span> <span class="n">include_expired_contracts</span> <span class="k">else</span> <span class="s2">&quot;N&quot;</span>
+</span><span id="chain-24"><a href="#chain-24"><span class="linenos">24</span></a>    <span class="n">contracts</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
+</span><span id="chain-25"><a href="#chain-25"><span class="linenos">25</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">future_name</span><span class="p">,</span>
+</span><span id="chain-26"><a href="#chain-26"><span class="linenos">26</span></a>        <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;FUT_CHAIN&quot;</span><span class="p">,</span>
+</span><span id="chain-27"><a href="#chain-27"><span class="linenos">27</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
+</span><span id="chain-28"><a href="#chain-28"><span class="linenos">28</span></a>        <span class="n">ovrds</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;INCLUDE_EXPIRED_CONTRACTS&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">),</span>
+</span><span id="chain-29"><a href="#chain-29"><span class="linenos">29</span></a>    <span class="p">)</span>
+</span><span id="chain-30"><a href="#chain-30"><span class="linenos">30</span></a>
+</span><span id="chain-31"><a href="#chain-31"><span class="linenos">31</span></a>    <span class="c1"># or [(&#39;INCLUDE_EXPIRED_CONTRACTS&#39;, include)]</span>
+</span><span id="chain-32"><a href="#chain-32"><span class="linenos">32</span></a>
+</span><span id="chain-33"><a href="#chain-33"><span class="linenos">33</span></a>    <span class="n">ref</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span>
+</span><span id="chain-34"><a href="#chain-34"><span class="linenos">34</span></a>        <span class="n">tickers</span><span class="o">=</span><span class="n">contracts</span><span class="p">,</span>
+</span><span id="chain-35"><a href="#chain-35"><span class="linenos">35</span></a>        <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">,</span> <span class="s2">&quot;FUT_MONTH_YR&quot;</span><span class="p">],</span>
+</span><span id="chain-36"><a href="#chain-36"><span class="linenos">36</span></a>        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
+</span><span id="chain-37"><a href="#chain-37"><span class="linenos">37</span></a>    <span class="p">)</span>
+</span><span id="chain-38"><a href="#chain-38"><span class="linenos">38</span></a>
+</span><span id="chain-39"><a href="#chain-39"><span class="linenos">39</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">stamp</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">stamp</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+</span><span id="chain-40"><a href="#chain-40"><span class="linenos">40</span></a>
+</span><span id="chain-41"><a href="#chain-41"><span class="linenos">41</span></a>    <span class="k">if</span> <span class="n">before</span><span class="p">:</span>
+</span><span id="chain-42"><a href="#chain-42"><span class="linenos">42</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">before</span><span class="p">]</span>
+</span><span id="chain-43"><a href="#chain-43"><span class="linenos">43</span></a>
+</span><span id="chain-44"><a href="#chain-44"><span class="linenos">44</span></a>    <span class="k">if</span> <span class="n">after</span><span class="p">:</span>
+</span><span id="chain-45"><a href="#chain-45"><span class="linenos">45</span></a>        <span class="n">ref</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">after</span><span class="p">]</span>
+</span><span id="chain-46"><a href="#chain-46"><span class="linenos">46</span></a>
+</span><span id="chain-47"><a href="#chain-47"><span class="linenos">47</span></a>    <span class="n">ref</span><span class="p">[</span><span class="s2">&quot;TICKER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">index</span>
+</span><span id="chain-48"><a href="#chain-48"><span class="linenos">48</span></a>    <span class="k">return</span> <span class="n">ref</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID_BB_GLOBAL&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;FUT_NOTICE_FIRST&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -217,6 +220,7 @@
 <li><strong>include_expired_contracts</strong>:  either True or False</li>
 <li><strong>before</strong>:  if specified, ignore contracts with notice before this date</li>
 <li><strong>after</strong>:  if specified, ignore contracts with notice after this data</li>
+<li><strong>connection</strong>:  Optional connection to connect to Bloomberg</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
@@ -240,52 +244,53 @@
 
     </div>
     <a class="headerlink" href="#ticker_continuous"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ticker_continuous-50"><a href="#ticker_continuous-50"><span class="linenos">50</span></a><span class="k">def</span><span class="w"> </span><span class="nf">ticker_continuous</span><span class="p">(</span>
-</span><span id="ticker_continuous-51"><a href="#ticker_continuous-51"><span class="linenos">51</span></a>    <span class="n">ticker</span><span class="p">,</span>
-</span><span id="ticker_continuous-52"><a href="#ticker_continuous-52"><span class="linenos">52</span></a>    <span class="n">pricing_source</span><span class="o">=</span><span class="s2">&quot;EXCH&quot;</span><span class="p">,</span>
-</span><span id="ticker_continuous-53"><a href="#ticker_continuous-53"><span class="linenos">53</span></a>    <span class="n">roll_type</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
-</span><span id="ticker_continuous-54"><a href="#ticker_continuous-54"><span class="linenos">54</span></a>    <span class="n">number_of_days</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="ticker_continuous-55"><a href="#ticker_continuous-55"><span class="linenos">55</span></a>    <span class="n">number_of_months</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="ticker_continuous-56"><a href="#ticker_continuous-56"><span class="linenos">56</span></a>    <span class="n">roll_adjustment</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
-</span><span id="ticker_continuous-57"><a href="#ticker_continuous-57"><span class="linenos">57</span></a><span class="p">):</span>
-</span><span id="ticker_continuous-58"><a href="#ticker_continuous-58"><span class="linenos">58</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="ticker_continuous-59"><a href="#ticker_continuous-59"><span class="linenos">59</span></a><span class="sd">    Function to create the Bloomberg ticker names for continuous futures</span>
-</span><span id="ticker_continuous-60"><a href="#ticker_continuous-60"><span class="linenos">60</span></a><span class="sd">    :param ticker: A name for a future, such as CC1 Comdty</span>
-</span><span id="ticker_continuous-61"><a href="#ticker_continuous-61"><span class="linenos">61</span></a><span class="sd">    :param pricing_source: usually &quot;EXCH&quot;</span>
-</span><span id="ticker_continuous-62"><a href="#ticker_continuous-62"><span class="linenos">62</span></a><span class="sd">    :param roll_type:</span>
-</span><span id="ticker_continuous-63"><a href="#ticker_continuous-63"><span class="linenos">63</span></a><span class="sd">                * N - Roll at first notice,</span>
-</span><span id="ticker_continuous-64"><a href="#ticker_continuous-64"><span class="linenos">64</span></a><span class="sd">                * R - relative at expiration</span>
-</span><span id="ticker_continuous-65"><a href="#ticker_continuous-65"><span class="linenos">65</span></a><span class="sd">    :param number_of_days: number of days prior to notice or expiration</span>
-</span><span id="ticker_continuous-66"><a href="#ticker_continuous-66"><span class="linenos">66</span></a><span class="sd">    :param number_of_months: number of months prior to notice or expiration</span>
-</span><span id="ticker_continuous-67"><a href="#ticker_continuous-67"><span class="linenos">67</span></a><span class="sd">    :param roll_adjustment:</span>
-</span><span id="ticker_continuous-68"><a href="#ticker_continuous-68"><span class="linenos">68</span></a><span class="sd">                * N - no roll adjustment</span>
-</span><span id="ticker_continuous-69"><a href="#ticker_continuous-69"><span class="linenos">69</span></a><span class="sd">                * D - roll adjustment by difference</span>
-</span><span id="ticker_continuous-70"><a href="#ticker_continuous-70"><span class="linenos">70</span></a><span class="sd">                * W - roll adjustment by weighted average</span>
-</span><span id="ticker_continuous-71"><a href="#ticker_continuous-71"><span class="linenos">71</span></a><span class="sd">                * R - roll adjustment by ratio</span>
-</span><span id="ticker_continuous-72"><a href="#ticker_continuous-72"><span class="linenos">72</span></a><span class="sd">    :return:</span>
-</span><span id="ticker_continuous-73"><a href="#ticker_continuous-73"><span class="linenos">73</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="ticker_continuous-74"><a href="#ticker_continuous-74"><span class="linenos">74</span></a>
-</span><span id="ticker_continuous-75"><a href="#ticker_continuous-75"><span class="linenos">75</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">):</span>
-</span><span id="ticker_continuous-76"><a href="#ticker_continuous-76"><span class="linenos">76</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>
-</span><span id="ticker_continuous-77"><a href="#ticker_continuous-77"><span class="linenos">77</span></a>        <span class="n">typ</span> <span class="o">=</span> <span class="s2">&quot;Index&quot;</span>
-</span><span id="ticker_continuous-78"><a href="#ticker_continuous-78"><span class="linenos">78</span></a>
-</span><span id="ticker_continuous-79"><a href="#ticker_continuous-79"><span class="linenos">79</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Comdty&quot;</span><span class="p">):</span>
-</span><span id="ticker_continuous-80"><a href="#ticker_continuous-80"><span class="linenos">80</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
-</span><span id="ticker_continuous-81"><a href="#ticker_continuous-81"><span class="linenos">81</span></a>        <span class="n">typ</span> <span class="o">=</span> <span class="s2">&quot;Comdty&quot;</span>
-</span><span id="ticker_continuous-82"><a href="#ticker_continuous-82"><span class="linenos">82</span></a>
-</span><span id="ticker_continuous-83"><a href="#ticker_continuous-83"><span class="linenos">83</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Curncy&quot;</span><span class="p">):</span>
-</span><span id="ticker_continuous-84"><a href="#ticker_continuous-84"><span class="linenos">84</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
-</span><span id="ticker_continuous-85"><a href="#ticker_continuous-85"><span class="linenos">85</span></a>        <span class="n">typ</span> <span class="o">=</span> <span class="s2">&quot;Curncy&quot;</span>
-</span><span id="ticker_continuous-86"><a href="#ticker_continuous-86"><span class="linenos">86</span></a>
-</span><span id="ticker_continuous-87"><a href="#ticker_continuous-87"><span class="linenos">87</span></a>    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{ticker}</span><span class="s2"> </span><span class="si">{roll_type}</span><span class="s2">:</span><span class="si">{days:02d}</span><span class="s2">_</span><span class="si">{months}</span><span class="s2">_</span><span class="si">{roll_adj}</span><span class="s2"> </span><span class="si">{source}</span><span class="s2"> </span><span class="si">{typ}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-</span><span id="ticker_continuous-88"><a href="#ticker_continuous-88"><span class="linenos">88</span></a>        <span class="n">ticker</span><span class="o">=</span><span class="n">ticker</span><span class="p">,</span>
-</span><span id="ticker_continuous-89"><a href="#ticker_continuous-89"><span class="linenos">89</span></a>        <span class="n">roll_type</span><span class="o">=</span><span class="n">roll_type</span><span class="p">,</span>
-</span><span id="ticker_continuous-90"><a href="#ticker_continuous-90"><span class="linenos">90</span></a>        <span class="n">days</span><span class="o">=</span><span class="n">number_of_days</span><span class="p">,</span>
-</span><span id="ticker_continuous-91"><a href="#ticker_continuous-91"><span class="linenos">91</span></a>        <span class="n">months</span><span class="o">=</span><span class="n">number_of_months</span><span class="p">,</span>
-</span><span id="ticker_continuous-92"><a href="#ticker_continuous-92"><span class="linenos">92</span></a>        <span class="n">roll_adj</span><span class="o">=</span><span class="n">roll_adjustment</span><span class="p">,</span>
-</span><span id="ticker_continuous-93"><a href="#ticker_continuous-93"><span class="linenos">93</span></a>        <span class="n">source</span><span class="o">=</span><span class="n">pricing_source</span><span class="p">,</span>
-</span><span id="ticker_continuous-94"><a href="#ticker_continuous-94"><span class="linenos">94</span></a>        <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span>
-</span><span id="ticker_continuous-95"><a href="#ticker_continuous-95"><span class="linenos">95</span></a>    <span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ticker_continuous-51"><a href="#ticker_continuous-51"><span class="linenos">51</span></a><span class="k">def</span><span class="w"> </span><span class="nf">ticker_continuous</span><span class="p">(</span>
+</span><span id="ticker_continuous-52"><a href="#ticker_continuous-52"><span class="linenos">52</span></a>    <span class="n">ticker</span><span class="p">,</span>
+</span><span id="ticker_continuous-53"><a href="#ticker_continuous-53"><span class="linenos">53</span></a>    <span class="n">pricing_source</span><span class="o">=</span><span class="s2">&quot;EXCH&quot;</span><span class="p">,</span>
+</span><span id="ticker_continuous-54"><a href="#ticker_continuous-54"><span class="linenos">54</span></a>    <span class="n">roll_type</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
+</span><span id="ticker_continuous-55"><a href="#ticker_continuous-55"><span class="linenos">55</span></a>    <span class="n">number_of_days</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="ticker_continuous-56"><a href="#ticker_continuous-56"><span class="linenos">56</span></a>    <span class="n">number_of_months</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="ticker_continuous-57"><a href="#ticker_continuous-57"><span class="linenos">57</span></a>    <span class="n">roll_adjustment</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span>
+</span><span id="ticker_continuous-58"><a href="#ticker_continuous-58"><span class="linenos">58</span></a><span class="p">):</span>
+</span><span id="ticker_continuous-59"><a href="#ticker_continuous-59"><span class="linenos">59</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ticker_continuous-60"><a href="#ticker_continuous-60"><span class="linenos">60</span></a><span class="sd">    Function to create the Bloomberg ticker names for continuous futures</span>
+</span><span id="ticker_continuous-61"><a href="#ticker_continuous-61"><span class="linenos">61</span></a><span class="sd">    :param ticker: A name for a future, such as CC1 Comdty</span>
+</span><span id="ticker_continuous-62"><a href="#ticker_continuous-62"><span class="linenos">62</span></a><span class="sd">    :param pricing_source: usually &quot;EXCH&quot;</span>
+</span><span id="ticker_continuous-63"><a href="#ticker_continuous-63"><span class="linenos">63</span></a><span class="sd">    :param roll_type:</span>
+</span><span id="ticker_continuous-64"><a href="#ticker_continuous-64"><span class="linenos">64</span></a><span class="sd">                * N - Roll at first notice,</span>
+</span><span id="ticker_continuous-65"><a href="#ticker_continuous-65"><span class="linenos">65</span></a><span class="sd">                * R - relative at expiration</span>
+</span><span id="ticker_continuous-66"><a href="#ticker_continuous-66"><span class="linenos">66</span></a><span class="sd">    :param number_of_days: number of days prior to notice or expiration</span>
+</span><span id="ticker_continuous-67"><a href="#ticker_continuous-67"><span class="linenos">67</span></a><span class="sd">    :param number_of_months: number of months prior to notice or expiration</span>
+</span><span id="ticker_continuous-68"><a href="#ticker_continuous-68"><span class="linenos">68</span></a><span class="sd">    :param roll_adjustment:</span>
+</span><span id="ticker_continuous-69"><a href="#ticker_continuous-69"><span class="linenos">69</span></a><span class="sd">                * N - no roll adjustment</span>
+</span><span id="ticker_continuous-70"><a href="#ticker_continuous-70"><span class="linenos">70</span></a><span class="sd">                * D - roll adjustment by difference</span>
+</span><span id="ticker_continuous-71"><a href="#ticker_continuous-71"><span class="linenos">71</span></a><span class="sd">                * W - roll adjustment by weighted average</span>
+</span><span id="ticker_continuous-72"><a href="#ticker_continuous-72"><span class="linenos">72</span></a><span class="sd">                * R - roll adjustment by ratio</span>
+</span><span id="ticker_continuous-73"><a href="#ticker_continuous-73"><span class="linenos">73</span></a><span class="sd">    :return:</span>
+</span><span id="ticker_continuous-74"><a href="#ticker_continuous-74"><span class="linenos">74</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="ticker_continuous-75"><a href="#ticker_continuous-75"><span class="linenos">75</span></a>    <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span id="ticker_continuous-76"><a href="#ticker_continuous-76"><span class="linenos">76</span></a>
+</span><span id="ticker_continuous-77"><a href="#ticker_continuous-77"><span class="linenos">77</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">):</span>
+</span><span id="ticker_continuous-78"><a href="#ticker_continuous-78"><span class="linenos">78</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>
+</span><span id="ticker_continuous-79"><a href="#ticker_continuous-79"><span class="linenos">79</span></a>        <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;Index&quot;</span>
+</span><span id="ticker_continuous-80"><a href="#ticker_continuous-80"><span class="linenos">80</span></a>
+</span><span id="ticker_continuous-81"><a href="#ticker_continuous-81"><span class="linenos">81</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Comdty&quot;</span><span class="p">):</span>
+</span><span id="ticker_continuous-82"><a href="#ticker_continuous-82"><span class="linenos">82</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+</span><span id="ticker_continuous-83"><a href="#ticker_continuous-83"><span class="linenos">83</span></a>        <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;Comdty&quot;</span>
+</span><span id="ticker_continuous-84"><a href="#ticker_continuous-84"><span class="linenos">84</span></a>
+</span><span id="ticker_continuous-85"><a href="#ticker_continuous-85"><span class="linenos">85</span></a>    <span class="k">if</span> <span class="n">ticker</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Curncy&quot;</span><span class="p">):</span>
+</span><span id="ticker_continuous-86"><a href="#ticker_continuous-86"><span class="linenos">86</span></a>        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+</span><span id="ticker_continuous-87"><a href="#ticker_continuous-87"><span class="linenos">87</span></a>        <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;Curncy&quot;</span>
+</span><span id="ticker_continuous-88"><a href="#ticker_continuous-88"><span class="linenos">88</span></a>
+</span><span id="ticker_continuous-89"><a href="#ticker_continuous-89"><span class="linenos">89</span></a>    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{ticker}</span><span class="s2"> </span><span class="si">{roll_type}</span><span class="s2">:</span><span class="si">{days:02d}</span><span class="s2">_</span><span class="si">{months}</span><span class="s2">_</span><span class="si">{roll_adj}</span><span class="s2"> </span><span class="si">{source}</span><span class="s2"> </span><span class="si">{_type}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+</span><span id="ticker_continuous-90"><a href="#ticker_continuous-90"><span class="linenos">90</span></a>        <span class="n">ticker</span><span class="o">=</span><span class="n">ticker</span><span class="p">,</span>
+</span><span id="ticker_continuous-91"><a href="#ticker_continuous-91"><span class="linenos">91</span></a>        <span class="n">roll_type</span><span class="o">=</span><span class="n">roll_type</span><span class="p">,</span>
+</span><span id="ticker_continuous-92"><a href="#ticker_continuous-92"><span class="linenos">92</span></a>        <span class="n">days</span><span class="o">=</span><span class="n">number_of_days</span><span class="p">,</span>
+</span><span id="ticker_continuous-93"><a href="#ticker_continuous-93"><span class="linenos">93</span></a>        <span class="n">months</span><span class="o">=</span><span class="n">number_of_months</span><span class="p">,</span>
+</span><span id="ticker_continuous-94"><a href="#ticker_continuous-94"><span class="linenos">94</span></a>        <span class="n">roll_adj</span><span class="o">=</span><span class="n">roll_adjustment</span><span class="p">,</span>
+</span><span id="ticker_continuous-95"><a href="#ticker_continuous-95"><span class="linenos">95</span></a>        <span class="n">source</span><span class="o">=</span><span class="n">pricing_source</span><span class="p">,</span>
+</span><span id="ticker_continuous-96"><a href="#ticker_continuous-96"><span class="linenos">96</span></a>        <span class="n">_type</span><span class="o">=</span><span class="n">_type</span><span class="p">,</span>
+</span><span id="ticker_continuous-97"><a href="#ticker_continuous-97"><span class="linenos">97</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 
