@@ -15,6 +15,7 @@ def chain(
     :param include_expired_contracts: either True or False
     :param before: if specified, ignore contracts with notice before this date
     :param after: if specified, ignore contracts with notice after this data
+    :param connection: Optional connection to connect to Bloomberg
     :return: DataFrame with row FIGI code: {FUT_NOTICE_FIRST: date, TICKER: Bloomberg contract name}.
     Note that we avoid actual Bloomberg contract names such as CLM2 Comdty as this name is immutable!
     """
@@ -70,25 +71,26 @@ def ticker_continuous(
                 * R - roll adjustment by ratio
     :return:
     """
+    _type = ""
 
     if ticker.endswith("Index"):
         ticker = ticker[:-6]
-        typ = "Index"
+        _type = "Index"
 
     if ticker.endswith("Comdty"):
         ticker = ticker[:-7]
-        typ = "Comdty"
+        _type = "Comdty"
 
     if ticker.endswith("Curncy"):
         ticker = ticker[:-7]
-        typ = "Curncy"
+        _type = "Curncy"
 
-    return "{ticker} {roll_type}:{days:02d}_{months}_{roll_adj} {source} {typ}".format(
+    return "{ticker} {roll_type}:{days:02d}_{months}_{roll_adj} {source} {_type}".format(
         ticker=ticker,
         roll_type=roll_type,
         days=number_of_days,
         months=number_of_months,
         roll_adj=roll_adjustment,
         source=pricing_source,
-        typ=typ,
+        _type=_type,
     )
