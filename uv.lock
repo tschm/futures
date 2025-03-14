@@ -9,14 +9,14 @@ resolution-markers = [
 
 [[package]]
 name = "blpapi"
-version = "3.25.1"
+version = "3.25.2.3"
 source = { registry = "https://blpapi.bloomberg.com/repository/releases/python/simple/" }
-sdist = { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.1.tar.gz", hash = "sha256:6df635fdbdb5afa068f766fc02d53e3eef77113b66dc57de0ea6caf2b1b6c812" }
+sdist = { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.2.3.tar.gz", hash = "sha256:9add6fb004273b90bd8f419a482b0a8e5ca62c245d293ecfcfd479200e7a5e2d" }
 wheels = [
-    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:6b6d9f3a2a876ab8b3b8ccd3b20034fb57f3433132277c2e2da5c48544ee14e2" },
-    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.1-py3-none-manylinux2014_x86_64.whl", hash = "sha256:4e97cfd493b79696338b6d7b96222d168081e5f0f38a3d25a509e83f91ac99d3" },
-    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.1-py3-none-win32.whl", hash = "sha256:f218aa4d28266299baf25b3ef1cd0c0a2a59bfc61fadcd5b591fbe288c1a75dc" },
-    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.1-py3-none-win_amd64.whl", hash = "sha256:9faea4d0aa29454857ed12f7b0ec7624eba72f12843ceae49651883d6714658b" },
+    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.2.3-py3-none-macosx_11_0_arm64.whl", hash = "sha256:d4a113270a20b979ea081cf8f7c605e2fac050518e249488d437e9229082b4b4" },
+    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.2.3-py3-none-manylinux2014_x86_64.whl", hash = "sha256:306c4492186ec1a454c3d9ebcb0b1af8d3e745a36d49ba81104d3570f5028172" },
+    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.2.3-py3-none-win32.whl", hash = "sha256:14c3cef096d09644f39a55219da232a736bbefb27755e7d7b75b782c5de024c0" },
+    { url = "https://blpapi.bloomberg.com/repository/releases/python/blpapi-3.25.2.3-py3-none-win_amd64.whl", hash = "sha256:684ec9443f6790ccc862f736369a194c4973462acf0c0f54d0489c998aec354c" },
 ]
 
 [[package]]
